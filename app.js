@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 
 // Root endpoint - Fixing the issue
 app.get('/', (req, res) => {
-  res.json({ success: true, message: 'API is working! 🎉' });
+  res.json({ success: true, message: 'API is working Succesfully Done By Kumar...,Sowmiya...,Vijay ....! 🎉' });
 });
 
 // Products endpoint
