@@ -28,7 +28,7 @@ app.get('/products', (req, res) => {
     {
       id: 2,
       name: 'Pepperoni Pizza',
-      category: 'Fast Food',
+      category: 'Slow Food',
       price: 9.99,
       description: 'A classic pepperoni pizza with a crispy crust and lots of cheese.',
       image: 'https://www.freepik.com/free-photo/classic-cheese-burger-with-beef-cutlet-vegetables-onions-isolated-white-background_137496226.htm#fromView=search&page=1&position=0&uuid=6c7b29a3-7232-4d07-beae-bdc0c52f24cc&query=cheese+burger'
