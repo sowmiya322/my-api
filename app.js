@@ -37,7 +37,7 @@ app.get('/products', (req, res) => {
     {
       id: 2,
       name: 'Pepperoni Pizza',
-      category: 'Fast Food',
+      category: 'Slow Food',
       price: 9.99,
       description: 'A classic pepperoni pizza with a crispy crust and lots of cheese.',
       image: 'https://example.com/pepperoni-pizza.jpg'
