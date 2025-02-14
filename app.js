@@ -35,7 +35,7 @@ app.get('/products', (req, res) => {
     },
     {
       id: 3,
-      name: 'Veggie Pasta',
+      name: 'Non Veggie Pasta',
       category: 'Italian',
       price: 7.99,
       description: 'Healthy pasta with fresh vegetables, olive oil, and Parmesan cheese.',
