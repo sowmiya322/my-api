@@ -3,13 +3,17 @@ const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 const firebaseAdmin = require('firebase-admin');
-const path = require('path'); // Add this line at the top
+const path = require('path');
 
 // Initialize environment variables
 dotenv.config();
 
-// Update the path to serviceAccountKey.json
-const serviceAccount = require(path.resolve(__dirname, 'backend', 'config', 'serviceAccountKey.json'));
+// Get Firebase credentials from environment variables
+const serviceAccount = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), // handle multiline private key
+};
 
 // Initialize Firebase Admin SDK
 firebaseAdmin.initializeApp({
