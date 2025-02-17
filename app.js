@@ -12,7 +12,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  res.json({ success: true, message: 'Hello, API is working   Succesfully Done By Kumar...,Sowmiya...,Vijay ....! 🎉 🎉' });
+  res.json({ success: true, message: 'API is working successfully! Done By Kumar..., Sowmiya..., Vijay 🎉' });
 });
 
 app.get('/products', (req, res) => {
