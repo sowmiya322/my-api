@@ -1,69 +1,80 @@
 const express = require('express');
-const cors = require('cors'); 
+const cors = require('cors');
+const morgan = require('morgan');
+const dotenv = require('dotenv');
+const firebaseAdmin = require('firebase-admin');
+
+// Initialize Firebase Admin SDK with the service account credentials
+const serviceAccount = require('./path/to/your/serviceAccountKey.json'); // Provide path to your service account JSON file
+
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(serviceAccount),
+  databaseURL: 'https://schoolmate-2babe-default-rtdb.firebaseio.com', // Replace with your Firebase Database URL
+});
+
+const db = firebaseAdmin.database();
 
 const app = express();
 
-app.use(express.json()); 
-app.use(cors()); 
+dotenv.config(); // Load environment variables
 
+// Middleware
+app.use(express.json());
+app.use(cors());
+app.use(morgan('dev'));
+
+// Logging middleware
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
 
+// Root endpoint
 app.get('/', (req, res) => {
-  res.json({ success: true, message: 'API is working successfully! Done By Kumar..., Sowmiya..., Vijay 🎉' });
+  res.json({
+    success: true,
+    message: 'API is working successfully!',
+  });
 });
 
-app.get('/products', (req, res) => {
-  const products = [
-    {
-      id: 1,
-      name: 'Cheese Burger',
-      category: 'Fast Food',
-      price: 5.99,
-      description: 'A delicious cheese burger with fresh lettuce, tomatoes, and melted cheese.',
-      image: 'https://www.freepik.com/free-photo/classic-cheese-burger-with-beef-cutlet-vegetables-onions-isolated-white-background_137496226.htm#fromView=search&page=1&position=0&uuid=6c7b29a3-7232-4d07-beae-bdc0c52f24cc&query=cheese+burger'
-    },
-    {
-      id: 2,
-      name: 'Pepperoni Pizza',
-      category: 'Slow Food',
-      price: 9.99,
-      description: 'A classic pepperoni pizza with a crispy crust and lots of cheese.',
-      image: 'https://www.freepik.com/free-photo/classic-cheese-burger-with-beef-cutlet-vegetables-onions-isolated-white-background_137496226.htm#fromView=search&page=1&position=0&uuid=6c7b29a3-7232-4d07-beae-bdc0c52f24cc&query=cheese+burger'
-    },
-    {
-      id: 3,
-      name: 'Non Veggie Pasta',
-      category: 'Italian',
-      price: 7.99,
-      description: 'Healthy pasta with fresh vegetables, olive oil, and Parmesan cheese.',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTQbuKL7NfxTMy1wUymb2tu25NONgb7TU_NE-KOzWF9UfMU5rRz'
-    },
-    {
-      id: 4,
-      name: 'Grilled Chicken Sandwich',
-      category: 'Fast Food',
-      price: 6.99,
-      description: 'Grilled chicken sandwich with crispy lettuce and creamy mayo.',
-      image: 'https://files.oaiusercontent.com/file-D2Ja2CA6HofhAMLp1zqnV4?se=2025-02-17T07%3A00%3A14Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D166e4d6b-f74d-4b08-8437-d35570af6648.webp&sig=17NAZ0dMaAuoGp47OZIfJTuN%2BWHWwZ2gJ69thruh%2BgI%3D'
-    },
-    {
-      id: 5,
-      name: 'Chocolate Shake',
-      category: 'Beverages',
-      price: 4.99,
-      description: 'Thick and creamy chocolate shake topped with whipped cream.',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTQbuKL7NfxTMy1wUymb2tu25NONgb7TU_NE-KOzWF9UfMU5rRz'
+// Fetch products from Firebase Realtime Database
+app.get('/products', async (req, res) => {
+  try {
+    const snapshot = await db.ref('products').once('value');
+    const products = snapshot.val();
+    if (products) {
+      res.json({ success: true, products });
+    } else {
+      res.json({ success: false, message: 'No products found' });
     }
-  ];
-
-  setTimeout(() => {
-    res.json({ success: true, products });
-  }, 500); 
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching products' });
+  }
 });
 
+// Add a product to Firebase Realtime Database
+app.post('/products', async (req, res) => {
+  const { name, category, price, description, image } = req.body;
+  
+  const newProductRef = db.ref('products').push();
+  const newProduct = {
+    id: newProductRef.key,
+    name,
+    category,
+    price,
+    description,
+    image,
+  };
+  
+  try {
+    await newProductRef.set(newProduct);
+    res.status(201).json({ success: true, product: newProduct });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error adding product' });
+  }
+});
+
+// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🔥 Server running on http://localhost:${PORT}`);
